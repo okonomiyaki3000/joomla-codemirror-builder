@@ -20,17 +20,17 @@ module.exports = function(grunt) {
 			}
 		},
 		unzip: {
-			// Unzip the downloaded file.
+			// Unzip the downloaded file, change the base directory to 'codemirror' (usually it's codemirror-<version number>)
 			codemirror: {
 				src: '<%= settings.directories.source %>/codemirror.zip',
-				dest: '<%= settings.directories.source %>/'
-			}
-		},
-		rename: {
-			// The distro is named with a version number which is annoying so rename it.
-			codemirror: {
-				src: grunt.file.expand(settings.directories.source + '/codemirror-*').pop(),
-				dest: '<%= settings.directories.source %>/codemirror'
+				dest: '<%= settings.directories.source %>/',
+				router: function (filepath) {
+					var parts = filepath.split('/');
+
+					parts[0] = 'codemirror';
+
+					return parts.join('/');
+				}
 			}
 		},
 		copy: {
@@ -49,14 +49,16 @@ module.exports = function(grunt) {
 		concat: {
 			// Concatenate all of the addon files that we will use.
 			codemirror: {
-				files: [{
-					src: settings.addons.js.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
-					dest:'<%= settings.directories.destination %>/lib/addons.js'
-				},
-				{
-					src: settings.addons.css.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
-					dest: '<%= settings.directories.destination %>/lib/addons.css'
-				}]
+				files: [
+					{
+						src: settings.addons.js.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
+						dest:'<%= settings.directories.destination %>/lib/addons.js'
+					},
+					{
+						src: settings.addons.css.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
+						dest: '<%= settings.directories.destination %>/lib/addons.css'
+					}
+				]
 			}
 		},
 		uglify: {
@@ -95,7 +97,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
-	grunt.loadNpmTasks('grunt-rename');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-curl');
 	grunt.loadNpmTasks('grunt-zip');
@@ -104,7 +105,6 @@ module.exports = function(grunt) {
 		'clean:codemirror_folders',
 		'curl:codemirror',
 		'unzip:codemirror',
-		'rename:codemirror',
 		'copy:codemirror',
 		'concat:codemirror',
 		'clean:codemirror_html',
