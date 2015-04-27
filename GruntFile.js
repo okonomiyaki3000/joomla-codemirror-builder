@@ -3,9 +3,16 @@ module.exports = function(grunt) {
 	var settings = grunt.file.readYAML('settings.yaml');
 
 	grunt.initConfig({
-	  pkg: grunt.file.readJSON('package.json'),
-	  settings: settings,
+		pkg: grunt.file.readJSON('package.json'),
+		settings: settings,
+		clean: {
+			// Remove contents of the source and destination directories left over from previous runs.
+			codemirror_folders: ['<%= settings.directories.source %>/**', '<%= settings.directories.destination %>/**'],
+			// Remove any html files because we don't need them.
+			codemirror_html: ['<%= settings.directories.destination %>/**/*.html']
+		},
 		curl: {
+			// Download the distro.
 			codemirror:
 			{
 				src: '<%= settings.CodeMirrorDistro %>',
@@ -13,27 +20,22 @@ module.exports = function(grunt) {
 			}
 		},
 		unzip: {
+			// Unzip the downloaded file.
 			codemirror: {
 				src: '<%= settings.directories.source %>/codemirror.zip',
 				dest: '<%= settings.directories.source %>/'
 			}
 		},
+		rename: {
+			// The distro is named with a version number which is annoying so rename it.
+			codemirror: {
+				src: grunt.file.expand(settings.directories.source + '/codemirror-*').pop(),
+				dest: '<%= settings.directories.source %>/codemirror'
+			}
+		},
 		copy: {
-			rename: {
-				files: [
-					{
-						expand: true,
-						cwd: '<%= settings.directories.source %>/',
-						src: ['codemirror-*/**'],
-						dest: '<%= settings.directories.source %>/codemirror/',
-						rename: function (dest, src) {
-							var parts = src.split('/').slice(1);
-							return dest + parts.join('/');
-						}
-					}
-				]
-			},
-			main: {
+			// Copy only the files we actually need to the destination directory.
+			codemirror: {
 				files: [
 					{
 						expand: true,
@@ -45,7 +47,8 @@ module.exports = function(grunt) {
 			}
 		},
 		concat: {
-			addons: {
+			// Concatenate all of the addon files that we will use.
+			codemirror: {
 				files: [{
 					src: settings.addons.js.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
 					dest:'<%= settings.directories.destination %>/lib/addons.js'
@@ -57,6 +60,7 @@ module.exports = function(grunt) {
 			}
 		},
 		uglify: {
+			// Minify JS.
 			codemirror: {
 				options: {
 					compress: true,
@@ -73,6 +77,7 @@ module.exports = function(grunt) {
 			}
 		},
 		cssmin: {
+			// Minify CSS.
 			codemirror: {
 				files: [{
 					expand: true,
@@ -86,51 +91,24 @@ module.exports = function(grunt) {
 		}
 	});
 
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-rename');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-curl');
 	grunt.loadNpmTasks('grunt-zip');
 
-	/**
-	 * The prep task removes old source and destination folders so we can start fresh on each run.
-	 */
-	grunt.registerTask('prep', 'Delete old folders, make new ones.', function () {
-		grunt.config.requires('settings.directories.source', 'settings.directories.destination');
-
-		var src = grunt.config.get('settings.directories.source'),
-				dest = grunt.config.get('settings.directories.destination');
-
-		if (grunt.file.exists(src)) grunt.file.delete(src, {force: true});
-		if (!grunt.file.isDir(src)) grunt.file.mkdir(src);
-
-		if (grunt.file.exists(dest)) grunt.file.delete(dest, {force: true});
-		if (!grunt.file.isDir(dest)) grunt.file.mkdir(dest);
-	});
-
-	/**
-	 * The nothml task removes all the .html files from the distro. We don't need them.
-	 */
-	grunt.registerTask('nohtml', 'Delete the index.html files.', function () {
-		grunt.config.requires('settings.directories.destination');
-
-		var dest = grunt.config.get('settings.directories.destination');
-
-		grunt.file.expand(dest + '/**/*.html').forEach(function (path) {
-			if (grunt.file.exists(path)) grunt.file.delete(path, {force: true});
-		});
-	});
-
 	grunt.registerTask('default', [
-		'prep',
-		'curl',
-		'unzip',
-		'copy:rename',
-		'copy:main',
-		'concat',
-		'nohtml',
-		'uglify',
-		'cssmin'
+		'clean:codemirror_folders',
+		'curl:codemirror',
+		'unzip:codemirror',
+		'rename:codemirror',
+		'copy:codemirror',
+		'concat:codemirror',
+		'clean:codemirror_html',
+		'uglify:codemirror',
+		'cssmin:codemirror'
 	]);
 };
