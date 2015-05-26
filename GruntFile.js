@@ -4,62 +4,34 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		settings: settings,
-		clean: {
-			// Remove contents of the source and destination directories left over from previous runs.
-			codemirror_folders: ['<%= settings.directories.source %>/**', '<%= settings.directories.destination %>/**'],
-			// Remove any html files because we don't need them.
-			codemirror_html: ['<%= settings.directories.destination %>/**/*.html']
-		},
-		curl: {
-			// Download the distro.
-			codemirror:
-			{
-				src: '<%= settings.CodeMirrorDistro %>',
-				dest: '<%= settings.directories.source %>/codemirror.zip'
-			}
-		},
-		unzip: {
-			// Unzip the downloaded file, change the base directory to 'codemirror' (usually it's codemirror-<version number>)
-			codemirror: {
-				src: '<%= settings.directories.source %>/codemirror.zip',
-				dest: '<%= settings.directories.source %>/',
-				router: function (filepath) {
-					var parts = filepath.split('/');
-
-					parts[0] = 'codemirror';
-
-					return parts.join('/');
+		bower: {
+			install: {
+				options: {
+					targetDir: './src',
+					cleanTargetDir: true,
+					layout: 'byComponent'
 				}
-			}
-		},
-		copy: {
-			// Copy only the files we actually need to the destination directory.
-			codemirror: {
-				files: [
-					{
-						expand: true,
-						cwd: '<%= settings.directories.source %>/codemirror/',
-						src: '<%= settings.copyItems %>',
-						dest: '<%= settings.directories.destination %>/'
-					}
-				]
 			}
 		},
 		concat: {
 			// Concatenate all of the addon files that we will use.
-			codemirror: {
+			addons: {
 				files: [
 					{
-						src: settings.addons.js.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
-						dest:'<%= settings.directories.destination %>/lib/addons.js'
+						src: settings.addons.js.map(function (v) {
+							return './src/CodeMirror/' + v;
+						}),
+						dest:'./src/CodeMirror/lib/addons.js'
 					},
 					{
-						src: settings.addons.css.map(function (v) { return '<%= settings.directories.destination %>/' + v; }),
-						dest: '<%= settings.directories.destination %>/lib/addons.css'
+						src: settings.addons.css.map(function (v) {
+							return './src/CodeMirror/' + v;
+						}),
+						dest: './src/CodeMirror/lib/addons.css'
 					}
 				]
 			}
+
 		},
 		uglify: {
 			// Minify JS.
@@ -72,9 +44,9 @@ module.exports = function(grunt) {
 					expand: true,
 					matchBase: true,
 					ext: '.min.js',
-					cwd: '<%= settings.directories.destination %>',
+					cwd: './src/CodeMirror/',
 					src: ['*.js', '!*.min.js'],
-					dest: '<%= settings.directories.destination %>'
+					dest: './src/CodeMirror/'
 				}]
 			}
 		},
@@ -85,29 +57,22 @@ module.exports = function(grunt) {
 					expand: true,
 					matchBase: true,
 					ext: '.min.css',
-					cwd: '<%= settings.directories.destination %>',
+					cwd: './src/CodeMirror/',
 					src: ['*.css', '!*.min.css', '!theme/*.css'],
-					dest: '<%= settings.directories.destination %>'
+					dest: './src/CodeMirror/',
 				}]
 			}
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-contrib-clean');
+	grunt.loadNpmTasks('grunt-bower-task');
 	grunt.loadNpmTasks('grunt-contrib-concat');
-	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
-	grunt.loadNpmTasks('grunt-curl');
-	grunt.loadNpmTasks('grunt-zip');
 
 	grunt.registerTask('default', [
-		'clean:codemirror_folders',
-		'curl:codemirror',
-		'unzip:codemirror',
-		'copy:codemirror',
-		'concat:codemirror',
-		'clean:codemirror_html',
+		'bower:install',
+		'concat:addons',
 		'uglify:codemirror',
 		'cssmin:codemirror'
 	]);

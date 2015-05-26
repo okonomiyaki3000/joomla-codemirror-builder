@@ -1,14 +1,3 @@
-CodeMirrorDistro: 'http://codemirror.net/codemirror.zip'
-directories:
-    source: 'src'
-    destination: 'dest'
-copyItems:
-    - 'addon/**'
-    - 'keymap/**'
-    - 'lib/**'
-    - 'mode/**'
-    - 'theme/**'
-    - 'LICENSE'
 addons:
     js:
         - 'addon/display/fullscreen.js'
