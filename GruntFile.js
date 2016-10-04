@@ -62,18 +62,33 @@ module.exports = function(grunt) {
 					dest: './src/CodeMirror/',
 				}]
 			}
+		},
+		'optimize-js': {
+			options: {sourceMap: false},
+			dist: {
+				files: [{
+					expand: true,
+					matchBase: true,
+					ext: '.min.js',
+					cwd: './src/CodeMirror/',
+					src: ['*.min.js'],
+					dest: './src/CodeMirror/',
+				}]
+			}
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-bower-task');
+	grunt.loadNpmTasks('grunt-bower-installer');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-optimize-js');
 
 	grunt.registerTask('default', [
 		'bower:install',
 		'concat:addons',
 		'uglify:codemirror',
+		'optimize-js',
 		'cssmin:codemirror'
 	]);
 };

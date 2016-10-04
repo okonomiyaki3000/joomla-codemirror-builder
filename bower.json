@@ -1,7 +1,7 @@
 {
 	"name": "Joomla!-CodeMirrorBuilder",
 	"description": "Downloads the latest CodeMirror distribution and configures it for Joomla!",
-	"version": "0.1.0",
+	"version": "0.2.0",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/okonomiyaki3000/joomla-codemirror-builder.git"
