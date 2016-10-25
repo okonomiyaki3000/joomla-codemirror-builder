@@ -1,18 +1,19 @@
 {
-	"name": "Joomla!-CodeMirrorBuilder",
-	"description": "Downloads the latest CodeMirror distribution and configures it for Joomla!",
-	"version": "0.2.0",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/okonomiyaki3000/joomla-codemirror-builder.git"
-	},
-	"devDependencies": {
-		"bower": "~1",
-		"grunt": "~1",
-		"grunt-bower-installer": "~0.3",
-		"grunt-contrib-concat": "~1",
-		"grunt-contrib-cssmin": "~1",
-		"grunt-contrib-uglify": "~2",
-		"grunt-optimize-js": "~0.4"
-	}
+  "name": "Joomla!-CodeMirrorBuilder",
+  "description": "Downloads the latest CodeMirror distribution and configures it for Joomla!",
+  "version": "0.3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/okonomiyaki3000/joomla-codemirror-builder.git"
+  },
+  "devDependencies": {
+    "grunt": "~1",
+    "grunt-contrib-clean": "^1.0.0",
+    "grunt-contrib-concat": "~1",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-cssmin": "~1",
+    "grunt-contrib-uglify": "~2",
+    "grunt-npm-install": "^0.3.1",
+    "grunt-optimize-js": "~0.4"
+  }
 }

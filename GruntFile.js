@@ -4,13 +4,15 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		bower: {
-			install: {
-				options: {
-					targetDir: './src',
-					cleanup: true,
-					layout: 'byComponent'
-				}
+		clean: ['src/CodeMirror'],
+		copy: {
+			codemirror: {
+				files: [{
+					expand: true,
+					cwd: 'node_modules/codemirror',
+					src: ['addon/**', 'keymap/**', 'lib/**', 'mode/**', 'theme/**', 'LICENSE'],
+					dest: 'src/CodeMirror'
+				}]
 			}
 		},
 		concat: {
@@ -78,14 +80,20 @@ module.exports = function(grunt) {
 		}
 	});
 
-	grunt.loadNpmTasks('grunt-bower-installer');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 	grunt.loadNpmTasks('grunt-contrib-concat');
+	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
 	grunt.loadNpmTasks('grunt-contrib-uglify');
+	grunt.loadNpmTasks('grunt-npm-install');
 	grunt.loadNpmTasks('grunt-optimize-js');
 
+
+	grunt.registerTask('installcm', ['npm-install:codemirror']);
 	grunt.registerTask('default', [
-		'bower:install',
+		'installcm',
+		'clean',
+		'copy:codemirror',
 		'concat:addons',
 		'uglify:codemirror',
 		'optimize-js',
