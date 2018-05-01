@@ -18,7 +18,6 @@ addons:
         - 'addon/search/match-highlighter.js'
         - 'addon/search/searchcursor.js'
         - 'addon/selection/active-line.js'
-        - 'keymap/vim.js'
         - 'mode/meta.js'
     css:
         - 'addon/display/fullscreen.css'
